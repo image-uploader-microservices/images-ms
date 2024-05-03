@@ -7,7 +7,7 @@ import { UpdateImageDto } from './dto/update-image.dto';
 
 @Controller()
 export class ImagesController {
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(private readonly imagesService: ImagesService) { }
 
   @MessagePattern('uploadImage')
   uploadImage(
@@ -22,7 +22,9 @@ export class ImagesController {
   }
 
   @MessagePattern('findOneImage')
-  findOne(@Payload() id: number) {
+  findOne(
+    @Payload() id: string,
+  ) {
     return this.imagesService.findOne(id);
   }
 

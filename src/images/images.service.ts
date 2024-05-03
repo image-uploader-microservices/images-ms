@@ -1,8 +1,9 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Image, PrismaClient } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 
 import { UpdateImageDto } from './dto/update-image.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ImagesService extends PrismaClient implements OnModuleInit {
@@ -13,25 +14,46 @@ export class ImagesService extends PrismaClient implements OnModuleInit {
     this.logger.log('Database connected');
   }
 
-  async uploadImage(image: Express.Multer.File): Promise<string> {
+  async uploadImage(image: Express.Multer.File): Promise<Image> {
     if (!image) {
       throw new RpcException({
         status: HttpStatus.BAD_REQUEST,
         message: 'You must insert an image to upload',
       });
-    }
+    };
 
-    console.log(image);
+    const uniqueImageName: string = `${randomUUID()}-${image.filename}`;
 
-    return 'This action adds a new image';
+    const imageToSave: Image = await this.image.create({
+      data: {
+        imageUrl: uniqueImageName,
+      },
+    });
+
+    return imageToSave;
   }
 
-  findAll() {
-    return `This action returns all images`;
+  async findAll(): Promise<Image[]> {
+    const images: Image[] = await this.image.findMany();
+
+    return images;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} image`;
+  async findOne(id: string): Promise<Image> {
+    const image: Image = await this.image.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!image) {
+      throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: `Image with id ${id} not found`,
+      });
+    };
+
+    return image;
   }
 
   update(id: number, updateImageDto: UpdateImageDto) {
