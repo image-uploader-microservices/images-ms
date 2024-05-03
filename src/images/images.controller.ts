@@ -23,7 +23,7 @@ export class ImagesController {
 
   @MessagePattern('findOneImage')
   findOne(
-    @Payload() id: string,
+    @Payload('id') id: string,
   ) {
     return this.imagesService.findOne(id);
   }
