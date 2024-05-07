@@ -21,8 +21,8 @@ export class ImagesService extends PrismaClient implements OnModuleInit {
         message: 'You must insert an image to upload',
       });
     };
-
-    const uniqueImageName: string = `${randomUUID()}-${image.filename}`;
+    
+    const uniqueImageName: string = `${randomUUID()}-${image.originalname}`;
 
     const imageToSave: Image = await this.image.create({
       data: {
